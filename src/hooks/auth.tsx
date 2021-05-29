@@ -40,8 +40,8 @@ function AuthProvider({ children }: AuthProviderProps) {
     async function signInWithGoogle() {
         try {
             const result = await Google.logInAsync({
-                iosClientId: 'KEY_IOS_CLIENT_GOOGLE',
-                androidClientId: 'KEY_ANDROID_CLIENT_GOOGLE',
+                iosClientId: 'KEY_IOS_CLIENT_GOOGLE', //substituir por uma key válida
+                androidClientId: 'KEY_ANDROID_CLIENT_GOOGLE', //substituir por uma key válida
                 scopes: ['profile', 'email']
             });
 
