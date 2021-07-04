@@ -44,8 +44,14 @@ $ yarn
 # Run the mobile application (Android)
 $ expo start
 
+# Run the test
+$ yarn test
+
+# Generate coverage test report
+$ yarn test --coverage
+
 ```
 
 ## Reference
 
-This application was developed during the classes of the Chapter II of the React Native track on Ignite, training promoted by Rocketseat.
+This application was developed during the classes of the Chapter II of the React Native track on Ignite, training promoted by Rocketseat, and reused in the Chapter V to explore the tests concept on React Native.
