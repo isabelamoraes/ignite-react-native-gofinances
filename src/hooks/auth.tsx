@@ -8,7 +8,11 @@ import React, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import * as Google from 'expo-google-app-auth';
+import * as AuthSession from 'expo-auth-session';
 import * as AppleAuthentication from 'expo-apple-authentication';
+
+const { CLIENT_ID } = process.env;
+const { REDIRECT_URI } = process.env;
 
 interface AuthProviderProps {
     children: ReactNode;
@@ -29,6 +33,13 @@ interface IAuthContextData {
     userStorageLoading: boolean;
 }
 
+interface AuthorizationResponse{
+    params: {
+        access_token: string;
+    };
+    type: string;
+}
+
 const AuthContext = createContext({} as IAuthContextData);
 
 function AuthProvider({ children }: AuthProviderProps) {
@@ -39,18 +50,23 @@ function AuthProvider({ children }: AuthProviderProps) {
 
     async function signInWithGoogle() {
         try {
-            const result = await Google.logInAsync({
-                iosClientId: 'KEY_IOS_CLIENT_GOOGLE', //substituir por uma key válida
-                androidClientId: 'KEY_ANDROID_CLIENT_GOOGLE', //substituir por uma key válida
-                scopes: ['profile', 'email']
-            });
+            const RESPONSE_TYPE = 'token';
+            const SCOPE = encodeURI('profile email');
 
-            if (result.type === 'success') {
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`;
+
+            const {type, params} = await AuthSession
+            .startAsync({ authUrl }) as AuthorizationResponse;
+
+            if (type === 'success') {
+                const response = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${params.access_token}`);
+                const userInfo = await response.json();
+
                 const userLogged = {
-                    id: String(result.user.id),
-                    email: result.user.email!,
-                    name: result.user.name!,
-                    photo: result.user.photoUrl!
+                    id: userInfo.id,
+                    email: userInfo.email,
+                    name: userInfo.given_name,
+                    photo: userInfo.picture
                 };
 
                 setUser(userLogged);
